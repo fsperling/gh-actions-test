@@ -41,11 +41,10 @@ jobs:
           sudo apt-get update
           sudo apt-get --yes install make
       
-      - name: Create short commit hash
-        run: SHORT_SHA=${GITHUB_SHA::7}
       - name: Build and push
         run: |
-          make build git-hash=${{ env.SHORT_SHA }}
+          SHORT_SHA=${GITHUB_SHA::7}
+          make build git-hash=${SHORT_SHA}
           make push
 
       - name: Integration tests
