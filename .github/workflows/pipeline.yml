@@ -1,9 +1,8 @@
-# Basic CI/CD workflow
-name: CI
+name: Test and build
 
 # Controls when the workflow will run
 # either push on main
-# or opened PR on any branch
+# or when a PR is opened on any branch
 on:
   push:
     branches: [ "main" ]
@@ -12,18 +11,22 @@ on:
 
 
 jobs:
-  # Run unit tests (always)
-  test:
+  setup:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Install make
         run: |
           sudo apt-get update
           sudo apt-get --yes install make
-      
+  
+  # Run unit tests (always)
+  unittests:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Run unit tests
         run: make test
 
@@ -31,16 +34,10 @@ jobs:
   # Run only when pushed to main
   build_push_integration_tests:
     if: github.event_name == 'push'
+    needs: setup
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Install make
-        run: |
-          sudo apt-get update
-          sudo apt-get --yes install make
-      
       - name: Build and push
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
@@ -50,5 +47,4 @@ jobs:
 
       - name: Integration tests
         run: make integration
-
 
