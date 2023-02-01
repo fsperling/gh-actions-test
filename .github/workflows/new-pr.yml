@@ -1,20 +1,18 @@
-# This is a basic workflow to help you get started with Actions
-
+# Basic CI/CD workflow
 name: CI
 
 # Controls when the workflow will run
+# either push on main
+# or opened PR on any branch
 on:
   push:
     branches: [ "main" ]
   pull_request:
     types: [ opened ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # Run unit tests
+  # Run unit tests (always)
   test:
     runs-on: ubuntu-latest
 
@@ -29,7 +27,9 @@ jobs:
       - name: Run unit tests
         run: make test
 
-  build:
+  
+  # Run only when pushed to main
+  build_push_integration_tests:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
@@ -42,10 +42,10 @@ jobs:
           sudo apt-get --yes install make
       
       - name: Create short commit hash
-        run: echo ${GITHUB_SHA::7} #>> $env:SHORT_HASH
+        run: SHORT_SHA=${GITHUB_SHA::7}
       - name: Build and push
         run: |
-          make build git-hash=${{ github.sha }}
+          make build git-hash=${{ env.SHORT_SHA }}
           make push
 
       - name: Integration tests
