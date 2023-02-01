@@ -42,7 +42,7 @@ jobs:
           sudo apt-get --yes install make
       
       - name: Create short commit hash
-        run: ${{ github.sha }} #>> $env:SHORT_HASH
+        run: echo ${{ github.sha::7 }} #>> $env:SHORT_HASH
       - name: Build and push
         run: |
           make build git-hash=${{ github.sha }}
