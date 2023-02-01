@@ -41,7 +41,6 @@ jobs:
       - name: Build and push
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
-          echo ${SHORT_SHA}
           make build git-hash=${SHORT_SHA}
           make push
 
